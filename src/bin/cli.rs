@@ -32,6 +32,10 @@ enum Command {
         #[clap(value_parser = bytes_from_str)]
         msg: Option<Bytes>,
     },
+    TTL {
+        /// Name of key to get
+        key: String,
+    },
     /// Get the value of key.
     Get {
         /// Name of key to get
@@ -97,6 +101,17 @@ async fn main() -> mini_redis::Result<()> {
                 println!("\"{}\"", string);
             } else {
                 println!("{:?}", value);
+            }
+        }
+        Command::TTL { key } => {
+            if let Some(value) = client.get(&key).await? {
+                if let Ok(string) = str::from_utf8(&value) {
+                    println!("\"{}\"", string);
+                } else {
+                    println!("{:?}", value);
+                }
+            } else {
+                println!("(nil)");
             }
         }
         Command::Get { key } => {
